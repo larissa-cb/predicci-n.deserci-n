@@ -1,0 +1,4 @@
+tu-repositorio/
+├── app.py
+├── requirements.txt
+└── README.md (opcional)
