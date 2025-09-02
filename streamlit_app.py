@@ -2,16 +2,16 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
-import matplotlib.pyplot as plt
 import seaborn as sns
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.preprocessing import StandardScaler, LabelEncoder
 import joblib
 
-# Configuración para evitar problemas con matplotlib en entornos headless
-import matplotlib
-matplotlib.use('Agg')  # Usar backend no interactivo
-plt.style.use('seaborn-v0_8')
+# En lugar de matplotlib, usar:
+st.bar_chart(pd.DataFrame({
+    'Factores': list(factors_data.keys()),
+    'Impacto': list(factors_data.values())
+}).set_index('Factores'))
 
 # Configuración de la página
 st.set_page_config(
