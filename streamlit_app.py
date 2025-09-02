@@ -7,12 +7,6 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.preprocessing import StandardScaler, LabelEncoder
 import joblib
 
-# En lugar de matplotlib, usar:
-st.bar_chart(pd.DataFrame({
-    'Factores': list(factors_data.keys()),
-    'Impacto': list(factors_data.values())
-}).set_index('Factores'))
-
 # Configuración de la página
 st.set_page_config(
     page_title="Sistema de Predicción de Deserción Universitaria",
@@ -30,7 +24,6 @@ st.sidebar.header("📋 Información del Estudiante")
 # Simulamos un modelo
 @st.cache_resource
 def load_model():
-    # Modelo simulado - en producción cargarías tu modelo real
     return RandomForestClassifier()
 
 model = load_model()
@@ -85,6 +78,10 @@ if st.sidebar.button("🔍 Predecir Riesgo de Deserción"):
         probability = 0.75 if risk_level == "Alto" else 0.45 if risk_level == "Moderado" else 0.15
         st.metric("Probabilidad de Abandono", f"{probability*100:.1f}%")
     
+    # Barra de progreso para el riesgo
+    risk_value = 0.75 if risk_level == "Alto" else 0.45 if risk_level == "Moderado" else 0.15
+    st.progress(risk_value, text=f"Nivel de riesgo: {risk_level}")
+    
     # Recomendaciones
     st.subheader("🎯 Recomendaciones de Intervención")
     
@@ -127,10 +124,9 @@ if st.sidebar.button("🔍 Predecir Riesgo de Deserción"):
     else:
         st.write("No se identificaron factores de riesgo significativos")
     
-    # Gráfico de factores
+    # Gráfico de factores usando gráficos nativos de Streamlit
     st.subheader("📈 Análisis de Impacto de Factores")
     
-    fig, ax = plt.subplots(figsize=(10, 6))
     factors_data = {
         'Calificación Previa': max(0, (100 - previous_grade) / 100),
         'Asistencia': max(0, (70 - attendance) / 70),
@@ -138,16 +134,23 @@ if st.sidebar.button("🔍 Predecir Riesgo de Deserción"):
         'Edad': 0.2 if age > 25 else 0.05
     }
     
-    colors = ['red' if x > 0.3 else 'orange' if x > 0.1 else 'green' for x in factors_data.values()]
-    bars = ax.bar(factors_data.keys(), factors_data.values(), color=colors)
-    ax.set_ylabel('Impacto en Riesgo')
-    ax.set_title('Contribución de Factores al Riesgo de Deserción')
-    plt.xticks(rotation=45)
+    # Crear DataFrame para el gráfico
+    chart_data = pd.DataFrame({
+        'Factor': list(factors_data.keys()),
+        'Impacto': list(factors_data.values())
+    })
     
-    # Asegurar que el gráfico se muestre correctamente
-    plt.tight_layout()
-    st.pyplot(fig)
-    plt.close(fig)  # Cerrar la figura para liberar memoria
+    # Gráfico de barras nativo de Streamlit
+    st.bar_chart(chart_data.set_index('Factor'))
+    
+    # Tabla con los valores
+    st.write("**Valores detallados:**")
+    impact_df = pd.DataFrame({
+        'Factor': factors_data.keys(),
+        'Nivel de Impacto': factors_data.values(),
+        'Estado': ['Alto' if x > 0.3 else 'Moderado' if x > 0.1 else 'Bajo' for x in factors_data.values()]
+    })
+    st.dataframe(impact_df, hide_index=True)
 
 else:
     st.info("👈 Complete la información del estudiante en la barra lateral y haga clic en 'Predecir Riesgo'")
