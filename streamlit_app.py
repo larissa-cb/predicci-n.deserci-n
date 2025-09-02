@@ -1,4 +1,3 @@
-# Crea un archivo app.py:
 # app.py
 import streamlit as st
 import pandas as pd
@@ -8,6 +7,11 @@ import seaborn as sns
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.preprocessing import StandardScaler, LabelEncoder
 import joblib
+
+# Configuración para evitar problemas con matplotlib en entornos headless
+import matplotlib
+matplotlib.use('Agg')  # Usar backend no interactivo
+plt.style.use('seaborn-v0_8')
 
 # Configuración de la página
 st.set_page_config(
@@ -23,11 +27,10 @@ st.markdown("---")
 # Sidebar para entrada de datos
 st.sidebar.header("📋 Información del Estudiante")
 
-# Simulamos un modelo (en realidad deberías cargar tu modelo entrenado)
+# Simulamos un modelo
 @st.cache_resource
 def load_model():
-    # Aquí cargarías tu modelo real
-    # return joblib.load('modelo_entrenado.pkl')
+    # Modelo simulado - en producción cargarías tu modelo real
     return RandomForestClassifier()
 
 model = load_model()
@@ -51,7 +54,7 @@ family_income = st.sidebar.selectbox("Ingreso Familiar",
 
 # Botón para predecir
 if st.sidebar.button("🔍 Predecir Riesgo de Deserción"):
-    # Preprocesar datos (simplificado)
+    # Preprocesar datos
     data = {
         'age': age,
         'previous_grade': previous_grade,
@@ -124,7 +127,7 @@ if st.sidebar.button("🔍 Predecir Riesgo de Deserción"):
     else:
         st.write("No se identificaron factores de riesgo significativos")
     
-    # Gráfico de factores (simulado)
+    # Gráfico de factores
     st.subheader("📈 Análisis de Impacto de Factores")
     
     fig, ax = plt.subplots(figsize=(10, 6))
@@ -140,7 +143,11 @@ if st.sidebar.button("🔍 Predecir Riesgo de Deserción"):
     ax.set_ylabel('Impacto en Riesgo')
     ax.set_title('Contribución de Factores al Riesgo de Deserción')
     plt.xticks(rotation=45)
+    
+    # Asegurar que el gráfico se muestre correctamente
+    plt.tight_layout()
     st.pyplot(fig)
+    plt.close(fig)  # Cerrar la figura para liberar memoria
 
 else:
     st.info("👈 Complete la información del estudiante en la barra lateral y haga clic en 'Predecir Riesgo'")
