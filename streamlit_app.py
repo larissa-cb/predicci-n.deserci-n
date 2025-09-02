@@ -1,3 +1,8 @@
+tu-repositorio/
+├── app.py
+├── requirements.txt
+└── (opcional) modelo_entrenado.pkl
+
 # app.py
 import streamlit as st
 import pandas as pd
